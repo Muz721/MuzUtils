@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MuzUtils.iml" filepath="$PROJECT_DIR$/MuzUtils.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/muzutilslibrary/muzutilslibrary.iml" filepath="$PROJECT_DIR$/muzutilslibrary/muzutilslibrary.iml" />
     </modules>
   </component>
 </project>

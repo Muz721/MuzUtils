@@ -1,8 +1,7 @@
-package com.muz.muzutils.utils;
+package com.muz.muzutilslibrary.util;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.util.Log;
 import android.view.View;
 
 /**

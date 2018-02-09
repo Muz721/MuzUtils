@@ -1,4 +1,4 @@
-package com.muz.muzutils.utils;
+package com.muz.muzutilslibrary.util;
 
 import android.content.Context;
 import android.view.View;
