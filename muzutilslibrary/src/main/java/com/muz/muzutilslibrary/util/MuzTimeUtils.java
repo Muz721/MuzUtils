@@ -46,6 +46,10 @@ public class MuzTimeUtils {
      */
     public static final String TIME_COLON_YMD_FORMAT="yyyy:MM:dd";
     /**
+     * Year month     The default format
+     */
+    public static final String TIME_DEFAULT_YM_FORMAT = "yyyy-MM";
+    /**
      * month day    Chinese format.
      */
     public static final String TIME_CHINESE_MD_FORMAT="MM月dd日";
