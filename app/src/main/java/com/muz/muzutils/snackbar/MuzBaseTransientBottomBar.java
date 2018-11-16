@@ -1,4 +1,5 @@
 package com.muz.muzutils.snackbar;
+
 import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 
 import android.animation.Animator;
@@ -50,34 +51,46 @@ public abstract class MuzBaseTransientBottomBar<B extends MuzBaseTransientBottom
      * @see MuzBaseTransientBottomBar#addCallback(BaseCallback)
      */
     public abstract static class BaseCallback<B> {
-        /** Indicates that the Snackbar was dismissed via a swipe.*/
+        /**
+         * Indicates that the Snackbar was dismissed via a swipe.
+         */
         public static final int DISMISS_EVENT_SWIPE = 0;
-        /** Indicates that the Snackbar was dismissed via an action click.*/
+        /**
+         * Indicates that the Snackbar was dismissed via an action click.
+         */
         public static final int DISMISS_EVENT_ACTION = 1;
-        /** Indicates that the Snackbar was dismissed via a timeout.*/
+        /**
+         * Indicates that the Snackbar was dismissed via a timeout.
+         */
         public static final int DISMISS_EVENT_TIMEOUT = 2;
-        /** Indicates that the Snackbar was dismissed via a call to {@link #dismiss()}.*/
+        /**
+         * Indicates that the Snackbar was dismissed via a call to {@link #dismiss()}.
+         */
         public static final int DISMISS_EVENT_MANUAL = 3;
-        /** Indicates that the Snackbar was dismissed from a new Snackbar being shown.*/
+        /**
+         * Indicates that the Snackbar was dismissed from a new Snackbar being shown.
+         */
         public static final int DISMISS_EVENT_CONSECUTIVE = 4;
 
-        /** @hide */
+        /**
+         * @hide
+         */
         @RestrictTo(LIBRARY_GROUP)
         @IntDef({DISMISS_EVENT_SWIPE, DISMISS_EVENT_ACTION, DISMISS_EVENT_TIMEOUT,
                 DISMISS_EVENT_MANUAL, DISMISS_EVENT_CONSECUTIVE})
         @Retention(RetentionPolicy.SOURCE)
-        public @interface DismissEvent {}
+        public @interface DismissEvent {
+        }
 
         /**
          * Called when the given {@link MuzBaseTransientBottomBar} has been dismissed, either
          * through a time-out, having been manually dismissed, or an action being clicked.
          *
          * @param transientBottomBar The transient bottom bar which has been dismissed.
-         * @param event The event which caused the dismissal. One of either:
-         *              {@link #DISMISS_EVENT_SWIPE}, {@link #DISMISS_EVENT_ACTION},
-         *              {@link #DISMISS_EVENT_TIMEOUT}, {@link #DISMISS_EVENT_MANUAL} or
-         *              {@link #DISMISS_EVENT_CONSECUTIVE}.
-         *
+         * @param event              The event which caused the dismissal. One of either:
+         *                           {@link #DISMISS_EVENT_SWIPE}, {@link #DISMISS_EVENT_ACTION},
+         *                           {@link #DISMISS_EVENT_TIMEOUT}, {@link #DISMISS_EVENT_MANUAL} or
+         *                           {@link #DISMISS_EVENT_CONSECUTIVE}.
          * @see MuzBaseTransientBottomBar#dismiss()
          */
         public void onDismissed(B transientBottomBar, @DismissEvent int event) {
@@ -102,7 +115,7 @@ public abstract class MuzBaseTransientBottomBar<B extends MuzBaseTransientBottom
         /**
          * Animates the content of the transient bottom bar in.
          *
-         * @param delay Animation delay.
+         * @param delay    Animation delay.
          * @param duration Animation duration.
          */
         void animateContentIn(int delay, int duration);
@@ -110,7 +123,7 @@ public abstract class MuzBaseTransientBottomBar<B extends MuzBaseTransientBottom
         /**
          * Animates the content of the transient bottom bar out.
          *
-         * @param delay Animation delay.
+         * @param delay    Animation delay.
          * @param duration Animation duration.
          */
         void animateContentOut(int delay, int duration);
@@ -123,7 +136,8 @@ public abstract class MuzBaseTransientBottomBar<B extends MuzBaseTransientBottom
     @IntDef({LENGTH_INDEFINITE, LENGTH_SHORT, LENGTH_LONG})
     @IntRange(from = 1)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Duration {}
+    public @interface Duration {
+    }
 
     /**
      * Show the Snackbar indefinitely. This means that the Snackbar will be displayed from the time
@@ -201,14 +215,15 @@ public abstract class MuzBaseTransientBottomBar<B extends MuzBaseTransientBottom
     @RestrictTo(LIBRARY_GROUP)
     interface OnAttachStateChangeListener {
         void onViewAttachedToWindow(View v);
+
         void onViewDetachedFromWindow(View v);
     }
 
     /**
      * Constructor for the transient bottom bar.
      *
-     * @param parent The parent for this transient bottom bar.
-     * @param content The content view for this transient bottom bar.
+     * @param parent              The parent for this transient bottom bar.
+     * @param content             The content view for this transient bottom bar.
      * @param contentViewCallback The content view callback for this transient bottom bar.
      */
     protected MuzBaseTransientBottomBar(@NonNull ViewGroup parent, @NonNull View content,
@@ -236,7 +251,8 @@ public abstract class MuzBaseTransientBottomBar<B extends MuzBaseTransientBottom
         mView = (SnackbarBaseLayout) inflater.inflate(
                 R.layout.layout_muz_snackbar, mTargetParent, false);
         mView.addView(content);
-
+        final FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mView.getChildAt(0).getLayoutParams();
+        lp.gravity = Gravity.CENTER_VERTICAL;
         ViewCompat.setAccessibilityLiveRegion(mView,
                 ViewCompat.ACCESSIBILITY_LIVE_REGION_POLITE);
         ViewCompat.setImportantForAccessibility(mView,
@@ -431,7 +447,8 @@ public abstract class MuzBaseTransientBottomBar<B extends MuzBaseTransientBottom
         mView.setOnAttachStateChangeListener(
                 new MuzBaseTransientBottomBar.OnAttachStateChangeListener() {
                     @Override
-                    public void onViewAttachedToWindow(View v) {}
+                    public void onViewAttachedToWindow(View v) {
+                    }
 
                     @Override
                     public void onViewDetachedFromWindow(View v) {
@@ -530,10 +547,12 @@ public abstract class MuzBaseTransientBottomBar<B extends MuzBaseTransientBottom
                 }
 
                 @Override
-                public void onAnimationStart(Animation animation) {}
+                public void onAnimationStart(Animation animation) {
+                }
 
                 @Override
-                public void onAnimationRepeat(Animation animation) {}
+                public void onAnimationRepeat(Animation animation) {
+                }
             });
             mView.startAnimation(anim);
         }
@@ -584,10 +603,12 @@ public abstract class MuzBaseTransientBottomBar<B extends MuzBaseTransientBottom
                 }
 
                 @Override
-                public void onAnimationStart(Animation animation) {}
+                public void onAnimationStart(Animation animation) {
+                }
 
                 @Override
-                public void onAnimationRepeat(Animation animation) {}
+                public void onAnimationRepeat(Animation animation) {
+                }
             });
             mView.startAnimation(anim);
         }
@@ -733,5 +754,31 @@ public abstract class MuzBaseTransientBottomBar<B extends MuzBaseTransientBottom
             }
             return super.onInterceptTouchEvent(parent, child, event);
         }
+    }
+
+    /**
+     * Location of muzSnackbar
+     * @param top Whether the top
+     */
+    public MuzBaseTransientBottomBar isTop(boolean top) {
+        final ViewGroup.LayoutParams lp = mView.getLayoutParams();
+        if (top) {
+            if (lp instanceof CoordinatorLayout.LayoutParams) {
+                final CoordinatorLayout.LayoutParams clp = (CoordinatorLayout.LayoutParams) lp;
+                clp.gravity = Gravity.TOP;
+            } else {
+                final FrameLayout.LayoutParams flp = (FrameLayout.LayoutParams) lp;
+                flp.gravity = Gravity.TOP;
+            }
+        }else {
+            if (lp instanceof CoordinatorLayout.LayoutParams) {
+                final CoordinatorLayout.LayoutParams clp = (CoordinatorLayout.LayoutParams) lp;
+                clp.gravity = Gravity.BOTTOM;
+            } else {
+                final FrameLayout.LayoutParams flp = (FrameLayout.LayoutParams) lp;
+                flp.gravity = Gravity.BOTTOM;
+            }
+        }
+        return this;
     }
 }

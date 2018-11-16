@@ -1,8 +1,15 @@
 package com.muz.muzutils.snackbar;
+
 import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
+
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
+import android.support.annotation.DimenRes;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
@@ -12,14 +19,19 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.muz.muzutils.R;
+
+import java.io.File;
+import java.lang.reflect.Type;
 
 
 /**
@@ -29,7 +41,7 @@ import com.muz.muzutils.R;
 public final class MuzSnackbar extends MuzBaseTransientBottomBar<MuzSnackbar> {
     /**
      * Callback class for {@link MuzSnackbar} instances.
-     *
+     * <p>
      * Note: this class is here to provide backwards-compatible way for apps written before
      * the existence of the base {@link MuzBaseTransientBottomBar} class.
      *
@@ -48,8 +60,10 @@ public final class MuzSnackbar extends MuzBaseTransientBottomBar<MuzSnackbar> {
             // Stub implementation to make API check happy.
         }
     }
+
     @Nullable
     private BaseCallback<MuzSnackbar> mCallback;
+
     /**
      * Constructor for the transient bottom bar.
      *
@@ -60,14 +74,15 @@ public final class MuzSnackbar extends MuzBaseTransientBottomBar<MuzSnackbar> {
     private MuzSnackbar(@NonNull ViewGroup parent, @NonNull View content, @NonNull ContentViewCallback contentViewCallback) {
         super(parent, content, contentViewCallback);
     }
+
     /**
      * Make a MuzSnackbar to display a message
-     *
+     * <p>
      * <p>MuzSnackbar will try and find a parent view to hold MuzSnackbar's view from the value given
      * to {@code view}. MuzSnackbar will walk up the view tree trying to find a suitable parent,
      * which is defined as a {@link CoordinatorLayout} or the window decor's content view,
      * whichever comes first.
-     *
+     * <p>
      * <p>Having a {@link CoordinatorLayout} in your view hierarchy allows MuzSnackbar to enable
      * certain features, such as swipe-to-dismiss and automatically moving of widgets like
      * {@link FloatingActionButton}.
@@ -79,7 +94,7 @@ public final class MuzSnackbar extends MuzBaseTransientBottomBar<MuzSnackbar> {
      */
     @NonNull
     public static MuzSnackbar make(@NonNull View view, @NonNull CharSequence text,
-                                @Duration int duration) {
+                                   @Duration int duration) {
         final ViewGroup parent = findSuitableParent(view);
         if (parent == null) {
             throw new IllegalArgumentException("No suitable parent found from the given view. "
@@ -98,12 +113,12 @@ public final class MuzSnackbar extends MuzBaseTransientBottomBar<MuzSnackbar> {
 
     /**
      * Make a MuzSnackbar to display a message.
-     *
+     * <p>
      * <p>MuzSnackbar will try and find a parent view to hold MuzSnackbar's view from the value given
      * to {@code view}. MuzSnackbar will walk up the view tree trying to find a suitable parent,
      * which is defined as a {@link CoordinatorLayout} or the window decor's content view,
      * whichever comes first.
-     *
+     * <p>
      * <p>Having a {@link CoordinatorLayout} in your view hierarchy allows MuzSnackbar to enable
      * certain features, such as swipe-to-dismiss and automatically moving of widgets like
      * {@link FloatingActionButton}.
@@ -168,6 +183,231 @@ public final class MuzSnackbar extends MuzBaseTransientBottomBar<MuzSnackbar> {
     public MuzSnackbar setText(@StringRes int resId) {
         return setText(getContext().getText(resId));
     }
+
+    /**
+     * Sets the text color of the text specified in
+     * {@link #setText(CharSequence)}.
+     */
+    @NonNull
+    public MuzSnackbar setTextColor(ColorStateList colors) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getMessageView();
+        tv.setTextColor(colors);
+        return this;
+    }
+
+    /**
+     * Sets the text color of the text specified in
+     * {@link #setText(CharSequence)}.
+     */
+    @NonNull
+    public MuzSnackbar setTextColor(@ColorInt int color) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getMessageView();
+        tv.setTextColor(color);
+        return this;
+    }
+
+    /**
+     * Sets the text MaxLines of the text specified in
+     * I don't recommend too many lines, my ideal maximum number of lines is 3 lines.
+     *
+     * @param maxLines Within the range of 1 to 3
+     *                 {@link #setText(CharSequence)}.
+     */
+    @NonNull
+    public MuzSnackbar setMaxLines(@IntRange(from = 1, to = 3) int maxLines) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getMessageView();
+        tv.setMaxLines(maxLines);
+        return this;
+    }
+
+    /**
+     * Sets the text icon of the text specified in
+     * {@link #setText(CharSequence)}.
+     */
+    public MuzSnackbar setIcon(@NonNull Drawable icon) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getMessageView();
+        tv.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
+        tv.setCompoundDrawablePadding(getView().getResources().getDimensionPixelSize(R.dimen.muz_snackbar_icon_padding_end));
+        return this;
+    }
+
+    /**
+     * Sets the text icon of the text specified in
+     * {@link #setText(CharSequence)}.
+     */
+    public MuzSnackbar setIcon(@DrawableRes int icon) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getMessageView();
+        tv.setCompoundDrawablesWithIntrinsicBounds(icon, 0, 0, 0);
+        tv.setCompoundDrawablePadding(getView().getResources().getDimensionPixelSize(R.dimen.muz_snackbar_icon_padding_end));
+        return this;
+    }
+
+    /**
+     * Sets the text icon padding of the text specified in
+     * dimes
+     */
+    public MuzSnackbar setIconPaddingDime(@DimenRes int dimes) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getMessageView();
+        tv.setCompoundDrawablePadding(getView().getResources().getDimensionPixelSize(dimes));
+        return this;
+    }
+
+    /**
+     * Sets the text icon padding of the text specified in
+     */
+    public MuzSnackbar setIconPadding(int padding) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getMessageView();
+        tv.setCompoundDrawablePadding(padding);
+        return this;
+    }
+
+    /**
+     * Sets the text size of the text specified in
+     * Please use it reasonably
+     * {@link #setText(CharSequence)}.
+     */
+    public MuzSnackbar setTextSize(@DimenRes int textSize) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getMessageView();
+        tv.setTextSize(getView().getResources().getDimension(textSize));
+        return this;
+    }
+
+    /**
+     * Sets the text typeface of the text specified in
+     */
+    public MuzSnackbar setTextTypeface(@NonNull Typeface typeFace) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getMessageView();
+        tv.setTypeface(typeFace);
+        return this;
+    }
+
+    /**
+     * Sets the text typeface of the text specified in
+     *
+     * @param ttf ttf.name
+     *            Assets path
+     */
+    public MuzSnackbar setTextTypeface(@NonNull String ttf) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getMessageView();
+        Typeface typeface = Typeface.createFromAsset(getContext().getAssets(), ttf);
+        tv.setTypeface(typeface);
+        return this;
+    }
+
+    /**
+     * Sets the text typeface of the text specified in
+     *
+     * @param path ttf.name
+     *             File path ;String format
+     */
+    public MuzSnackbar setTextTypefaceFile(@NonNull String path) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getMessageView();
+        Typeface typeface = Typeface.createFromFile(path);
+        tv.setTypeface(typeface);
+        return this;
+    }
+
+    /**
+     * Sets the text typeface of the text specified in
+     *
+     * @param path ttf.name
+     *             File path;File format
+     */
+    public MuzSnackbar setTextTypefaceFile(@NonNull File path) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getMessageView();
+        Typeface typeface = Typeface.createFromFile(path);
+        tv.setTypeface(typeface);
+        return this;
+    }
+
+    /**
+     * Sets the text typeface of the action specified in
+     */
+    public MuzSnackbar setActionTextTypeface(@NonNull Typeface typeFace) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getActionView();
+        tv.setTypeface(typeFace);
+        return this;
+    }
+
+    /**
+     * Sets the text typeface of the action specified in
+     *
+     * @param ttf ttf.name
+     *            Assets path
+     */
+    public MuzSnackbar setActionTextTypeface(@NonNull String ttf) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getActionView();
+        Typeface typeface = Typeface.createFromAsset(getContext().getAssets(), ttf);
+        tv.setTypeface(typeface);
+        return this;
+    }
+
+    /**
+     * Sets the text typeface of the action specified in
+     *
+     * @param path ttf.name
+     *             File path ;String format
+     */
+    public MuzSnackbar setActionTextTypefaceFile(@NonNull String path) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getActionView();
+        Typeface typeface = Typeface.createFromFile(path);
+        tv.setTypeface(typeface);
+        return this;
+    }
+
+    /**
+     * Sets the text typeface of the action specified in
+     *
+     * @param path ttf.name
+     *             File path;File format
+     */
+    public MuzSnackbar setActionTextTypefaceFile(@NonNull File path) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getActionView();
+        Typeface typeface = Typeface.createFromFile(path);
+        tv.setTypeface(typeface);
+        return this;
+    }
+
+    /**
+     * Sets the text size of the action specified in
+     * Please use it reasonably
+     * {@link #setAction(CharSequence, View.OnClickListener)}
+     */
+    public MuzSnackbar setActionTextSize(@DimenRes int textSize) {
+        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+        final TextView tv = contentLayout.getActionView();
+        tv.setTextSize(getView().getResources().getDimension(textSize));
+        return this;
+    }
+
+    /**
+     * Restore snackbar txt and button initial gravity
+     * Deprecated
+     */
+//    public MuzSnackbar setTxtAndBtnInitialGravity(){
+//        final MuzSnackbarContentLayout contentLayout = (MuzSnackbarContentLayout) mView.getChildAt(0);
+//        final TextView tv = contentLayout.getMessageView();
+//        tv.setGravity(0);
+//        final TextView actionView = contentLayout.getActionView();
+//        actionView.setGravity(0);
+//        return this;
+//    }
 
     /**
      * Set the action to be displayed in this {@link MuzBaseTransientBottomBar}.
@@ -240,10 +480,10 @@ public final class MuzSnackbar extends MuzBaseTransientBottomBar<MuzSnackbar> {
      * {@link #removeCallback(BaseCallback)} to remove a registered callback.
      *
      * @param callback Callback to notify when transient bottom bar events occur.
-     * @deprecated Use {@link #addCallback(BaseCallback)}
      * @see Callback
      * @see #addCallback(BaseCallback)
      * @see #removeCallback(BaseCallback)
+     * @deprecated Use {@link #addCallback(BaseCallback)}
      */
     @Deprecated
     @NonNull
@@ -263,9 +503,7 @@ public final class MuzSnackbar extends MuzBaseTransientBottomBar<MuzSnackbar> {
     }
 
     /**
-     * @hide
-     *
-     * Note: this class is here to provide backwards-compatible way for apps written before
+     * @hide Note: this class is here to provide backwards-compatible way for apps written before
      * the existence of the base {@link MuzBaseTransientBottomBar} class.
      */
     @RestrictTo(LIBRARY_GROUP)
